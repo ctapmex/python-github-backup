@@ -403,7 +403,7 @@ def get_github_repo_url(args, repository):
     if repository.get('is_gist'):
         if args.prefer_ssh:
             # The git_pull_url value is always https for gists, so we need to transform it to ssh form
-            repo_url = re.sub(r'^https?:\/\/(.+)\/(.+)\.git$', r'git@\1:\2.git', repository['git_pull_url'])
+            repo_url = re.sub(r'^https?://(.+)/(.+)\.git$', r'git@\1:\2.git', repository['git_pull_url'])
             repo_url = re.sub(r'^git@gist\.', 'git@', repo_url)  # strip gist subdomain for better hostkey compatibility
         else:
             repo_url = repository['git_pull_url']
@@ -447,7 +447,7 @@ def retrieve_data_gen(args, template, query_args=None, single_request=False):
             log_warning("JSON decode error detected")
             read_error = True
         except TimeoutError:
-            log_warning("Tiemout error detected")
+            log_warning("Timeout error detected")
             read_error = True
         else:
             read_error = False
@@ -480,7 +480,7 @@ def retrieve_data_gen(args, template, query_args=None, single_request=False):
                 log_warning("JSON decode error detected")
                 read_error = True
             except TimeoutError:
-                log_warning("Tiemout error detected")
+                log_warning("Timeout error detected")
                 read_error = True
 
         if status_code != 200:
@@ -522,7 +522,7 @@ def get_query_args(query_args=None):
 def _get_response(request, auth, template):
     retry_timeout = 3
     errors = []
-    # We'll make requests in a loop so we can
+    # We'll make requests in a loop, so we can
     # delay and retry in the case of rate-limiting
     while True:
         should_continue = False
@@ -568,7 +568,7 @@ def _construct_request(per_page, page, query_args, template, auth, as_app=None):
 
 
 def _request_http_error(exc, auth, errors):
-    # HTTPError behaves like a Response so we can
+    # HTTPError behaves like a Response, so we can
     # check the status code and headers to see exactly
     # what failed.
 
@@ -578,7 +578,7 @@ def _request_http_error(exc, auth, errors):
 
     if exc.code == 403 and limit_remaining < 1:
         # The X-RateLimit-Reset header includes a
-        # timestamp telling us when the limit will reset
+        # timestamp telling us when the limit will reset,
         # so we can calculate how long to wait rather
         # than inefficiently polling:
         gm_now = calendar.timegm(time.gmtime())
@@ -598,7 +598,7 @@ def _request_http_error(exc, auth, errors):
 
 
 def _request_url_error(template, retry_timeout):
-    # Incase of a connection timing out, we can retry a few time
+    # In case of a connection timing out, we can retry a few time
     # But we won't crash and not back-up the rest now
     log_info('{} timed out'.format(template))
     retry_timeout -= 1
@@ -612,7 +612,7 @@ def _request_url_error(template, retry_timeout):
 
 class S3HTTPRedirectHandler(HTTPRedirectHandler):
     """
-    A subclassed redirect handler for downloading Github assets from S3.
+    A subclassed redirect handler for downloading GitHub assets from S3.
 
     urllib will add the Authorization header to the redirected request to S3, which will result in a 400,
     so we should remove said header on redirect.
@@ -624,7 +624,7 @@ class S3HTTPRedirectHandler(HTTPRedirectHandler):
 
 
 def download_file(url, path, auth):
-    # Skip downloading release assets if they already exist on disk so we don't redownload on every sync
+    # Skip downloading release assets if they already exist on disk, so we don't redownload on every sync
     if os.path.exists(path):
         return
 
