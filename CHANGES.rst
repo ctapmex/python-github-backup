@@ -1,9 +1,65 @@
 Changelog
 =========
 
-0.39.0 (2021-03-18)
+0.41.0 (2022-03-02)
 -------------------
-------------
+-------------------
+- Release version 0.41.0. [Jose Diaz-Gonzalez]
+- Merge pull request #191 from SkySoft-ATM/bug/lfs_mirror. [Jose Diaz-
+  Gonzalez]
+
+  git lfs clone does not respect --mirror
+- Git lfs clone doe snot respect --mirror. [Louis Parisot]
+
+
+0.40.2 (2021-12-29)
+-------------------
+- Release version 0.40.2. [Jose Diaz-Gonzalez]
+- Merge pull request #186 from atinary-afoulon/patch-1. [Jose Diaz-
+  Gonzalez]
+
+  Fix lint issues raised by Flake8
+- Fix lint issues raised by Flake8. [atinary-afoulon]
+
+  According to job:
+  [ https://app.circleci.com/pipelines/github/josegonzalez/python-github-backup/30/workflows/74eb93f2-2505-435d-b728-03b3cc04c14a/jobs/23 ]
+
+  Failed on the following checks:
+  ./github_backup/github_backup.py:20:1: F811 redefinition of unused 'logging' from line 14
+  ./github_backup/github_backup.py:45:1: E302 expected 2 blank lines, found 1
+  ./github_backup/github_backup.py:136:20: E251 unexpected spaces around keyword / parameter equals
+
+
+0.40.1 (2021-09-22)
+-------------------
+- Release version 0.40.1. [Jose Diaz-Gonzalez]
+- Merge pull request #180 from whwright/revert-to-fetch. [Jose Diaz-
+  Gonzalez]
+
+  Revert to fetch
+- Revert to fetch. [Harrison Wright]
+
+
+0.40.0 (2021-07-12)
+-------------------
+- Release version 0.40.0. [Jose Diaz-Gonzalez]
+- Merge pull request #177 from jacekn/retry. [Jose Diaz-Gonzalez]
+
+  Add retry on certain network errors
+- Add retry on certain network errors. [Jacek Nykis]
+
+  This change includes certain network level errors in the retry logic.
+  It partially address #110 but I think more comprehensive fix would be useful.
+- Merge pull request #178 from pew/patch-1. [Jose Diaz-Gonzalez]
+
+  pull changes from remote
+- Pull changes from remote. [Jonas]
+
+  use `git pull` to pull actual files from the remote instead of using `fetch` for only the metadata
+
+
+0.39.0 (2021-03-19)
+-------------------
 
 Fix
 ~~~
@@ -11,6 +67,7 @@ Fix
 
 Other
 ~~~~~
+- Release version 0.39.0. [Jose Diaz-Gonzalez]
 - Merge pull request #173 from gallofeliz/make-compatible-python-call.
   [Jose Diaz-Gonzalez]
 
