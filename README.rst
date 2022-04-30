@@ -36,7 +36,7 @@ CLI Usage is as follows::
                   [--pull-comments] [--pull-commits] [--pull-details]
                   [--labels] [--hooks] [--milestones] [--repositories]
                   [--bare] [--lfs] [--wikis] [--gists] [--starred-gists]
-                  [--skip-existing] [-L [LANGUAGES [LANGUAGES ...]]]
+                  [--skip-archived] [--skip-existing] [-L [LANGUAGES [LANGUAGES ...]]]
                   [-N NAME_REGEX] [-H GITHUB_HOST] [-O] [-R REPOSITORY]
                   [-P] [-F] [--prefer-ssh] [-v]
                   [--keychain-name OSX_KEYCHAIN_ITEM_NAME]
@@ -88,6 +88,7 @@ CLI Usage is as follows::
       --wikis               include wiki clone in backup
       --gists               include gists in backup [*]
       --starred-gists       include starred gists in backup [*]
+      --skip-archived       skip project if it is archived
       --skip-existing       skip project if a backup directory exists
       -L [LANGUAGES [LANGUAGES ...]], --languages [LANGUAGES [LANGUAGES ...]]
                             only allow these languages
