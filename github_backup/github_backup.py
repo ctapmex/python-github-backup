@@ -7,7 +7,6 @@ import argparse
 import base64
 import calendar
 import codecs
-import datetime
 import errno
 import getpass
 import json
@@ -17,6 +16,7 @@ import select
 import subprocess
 import sys
 import logging
+from logging import Formatter
 import time
 import platform
 from urllib.parse import urlparse
@@ -36,32 +36,59 @@ except ImportError:
     VERSION = 'unknown'
 
 FNULL = open(os.devnull, 'w')
+# default logger
+glogger = logging.getLogger(__name__)
 
 
-def _get_log_date():
-    return datetime.datetime.isoformat(datetime.datetime.now())
+def setup_logging(args):
+    console_handler = logging.StreamHandler(stream=sys.stdout)
+    if args.quiet:
+        console_handler.setLevel(logging.ERROR)
+    else:
+        console_handler.setLevel(logging.INFO)
+
+    file_handler = logging.FileHandler("github_backup.log")
+    file_handler.setFormatter(
+        Formatter(fmt='[%(asctime)s.%(msecs)03d: %(levelname)s] %(message)s', datefmt='%Y-%m-%dT%H:%M:%S'))
+    file_handler.setLevel(logging.DEBUG)
+
+    glogger.setLevel(logging.DEBUG)
+    glogger.addHandler(console_handler)
+    glogger.addHandler(file_handler)
+    glogger.propagate = False
 
 
 def log_info(message):
     """
-    Log message (str) or messages (List[str]) to stdout
+    Log message (str) or messages (List[str])
     """
     if type(message) == str:
         message = [message]
 
     for msg in message:
-        logging.info(msg)
+        glogger.info(msg)
 
 
 def log_warning(message):
     """
-    Log message (str) or messages (List[str]) to stderr
+    Log message (str) or messages (List[str])
     """
     if type(message) == str:
         message = [message]
 
     for msg in message:
-        logging.warning(msg)
+        glogger.warning(msg)
+
+
+def log_debug(message):
+    """
+    Log message (str) or messages (List[str])
+    """
+    if type(message) == str:
+        message = [message]
+
+    for msg in message:
+        glogger.debug(msg)
 
 
 def logging_subprocess(popenargs,
@@ -324,6 +351,11 @@ def parse_args(args=None):
                         type=float,
                         default=30.0,
                         help='wait this amount of seconds when API request throttling is active (default: 30.0, requires --throttle-limit to be set)')
+    parser.add_argument('-q',
+                        '--quiet',
+                        action='store_true',
+                        dest='quiet',
+                        help='supress non-error log messages')
     return parser.parse_args(args)
 
 
@@ -563,7 +595,7 @@ def _construct_request(per_page, page, query_args, template, auth, as_app=None):
             auth = auth.encode('ascii')
             request.add_header('Authorization', 'token '.encode('ascii') + auth)
             request.add_header('Accept', 'application/vnd.github.machine-man-preview+json')
-    log_info('Requesting {}?{}'.format(template, querystring))
+    log_debug('Requesting {}?{}'.format(template, querystring))
     return request
 
 
@@ -755,7 +787,7 @@ def filter_repositories(args, unfiltered_repositories):
 
 
 def backup_repositories(args, output_directory, repositories):
-    log_info('Backing up repositories')
+    log_info('Starting backup repositories')
     repos_template = 'https://{0}/repos'.format(get_github_api_host(args))
 
     if args.incremental:
@@ -830,6 +862,8 @@ def backup_repositories(args, output_directory, repositories):
 
     if args.incremental:
         open(last_update_path, 'w').write(last_update)
+
+    log_info('Backup repositories finished')
 
 
 def backup_issues(args, repo_cwd, repository, repos_template):
@@ -1000,7 +1034,7 @@ def backup_labels(args, repo_cwd, repository, repos_template):
 def backup_hooks(args, repo_cwd, repository, repos_template):
     auth = get_auth(args)
     if not auth:
-        log_info("Skipping hooks since no authentication provided")
+        log_warning("Skipping hooks since no authentication provided")
         return
     hook_cwd = os.path.join(repo_cwd, 'hooks')
     output_file = '{0}/hooks.json'.format(hook_cwd)
@@ -1075,7 +1109,7 @@ def fetch_repository(name,
                                   stderr=FNULL,
                                   shell=True)
     if initialized == 128:
-        log_info("Skipping {0} ({1}) since it's not initialized".format(
+        log_warning("Skipping {0} ({1}) since it's not initialized".format(
             name, masked_remote_url))
         return
 
@@ -1120,6 +1154,7 @@ def fetch_repository(name,
 
 
 def backup_account(args, output_directory):
+    log_info('Starting backup account')
     account_cwd = os.path.join(output_directory, 'account')
 
     if args.include_starred or args.include_everything:
@@ -1158,6 +1193,7 @@ def backup_account(args, output_directory):
                      output_file,
                      account_cwd)
 
+    log_info('Backup account finished')
 
 def _backup_data(args, name, template, output_file, output_directory):
     skip_existing = args.skip_existing
