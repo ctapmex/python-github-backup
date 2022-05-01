@@ -31,7 +31,11 @@ def main():
         check_git_lfs_install()
 
     if not args.as_app:
-        log_info('Backing up user {0} to {1}'.format(args.user, output_directory))
+        if args.organization:
+            user_type = 'organization'
+        else:
+            user_type = 'user'
+        log_info('Backing up {0} {1} to {2}'.format(user_type, args.user, output_directory))
         authenticated_user = get_authenticated_user(args)
     else:
         authenticated_user = {'login': None}
